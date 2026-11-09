@@ -36,3 +36,8 @@ hmm, so I think lets start working now and firtly lets setup the coral and then 
 Lets first start by initiating git and make a github repo
 
 also bro we'll change the name of it, as its too generic, like who tf gives there project name like "StudyHub", whatever, IDK if ill devlog more, lets see how it goes. 
+
+Why is the work I am doing on terminal not being counted??
+
+OK I have decided the name, it should be called, StudyAL *IK its not great but better than studyhub*
+
