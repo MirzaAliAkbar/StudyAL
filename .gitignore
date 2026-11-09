@@ -1,0 +1,20 @@
+# .gitignore
+# Python
+__pycache__/
+*.py[cod]
+venv/
+.venv/
+
+# Flask
+instance/
+*.sqlite
+
+# Environment Variables
+.env
+
+# IDE
+.vscode/
+.idea/
+
+# Uploaded Files
+static/uploads/
