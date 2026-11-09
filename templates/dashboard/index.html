@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h2>Dashboard</h2>
+
+{% if days_left is not none %}
+    <div class="alert alert-info">Next exam in <strong>{{ days_left }}</strong> days</div>
+{% endif %}
+
+<div class="mb-4">
+    <a href="{{ url_for('subjects.manage') }}" class="btn btn-primary">Manage Subjects</a>
+    <a href="{{ url_for('subjects.deadlines') }}" class="btn btn-secondary">Manage Deadlines</a>
+</div>
+
+<h4>Subjects</h4>
+{% if subjects %}
+    <ul>
+        {% for subject in subjects %}
+            <li>{{ subject.name }}</li>
+        {% endfor %}
+    </ul>
+    {% else %}
+        <p>No subjects yet.</p>
+    {% endif %}
+
+    <h4>Upcoming Deadlines</h4>
+    {% if deadlines %}
+        <ul>
+            {% for deadline in deadlines %}
+                <li>{{ deadline.title }} - {{ deadline.exam_date }} ({{ deadline.type}})</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No deadlines yet.</p>
+    {% endif %}
+    {% endblock %}

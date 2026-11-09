@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% set hide_nav = True %}
+{% block title %}Board{% endblock %}
+{% block content %}
+<div id="board">
+    <div id="viewport">
+        {% if not subject_nodes and not deadline_nodes and not note_nodes %}
+        <div class="empty-board">
+            <h3>Your board is empty</h3>
+            <p>Add subjects and deadlines from the Dashboard</p>
+        </div>
+        {% endif %}
+
+        {% for itemin subject_nodes%}
+        <div class="node subject" style="left: {{ item.x }}px; top: {{ item.y }}px;">
+            <h3>{{ item.subject.name}}</h3>
+            <span class="badge">Subject</span>
+        </div>
+        {% endfor %}
+
+        {% for item in deadline_nodes %}
+        <div class="node deadline" style="left: {{ item.x }}px; top: {{ item.y }}px;">
+            <h3>{{ item.deadline.exam_date }}</h3>
+            <div class="date">{{ item.deadline.exam }}</div>
+            <span class="badge">{{ item.deadline.type }}</span>
+        </div>
+        {% endfor %}
+
+        {% for item in note_nodes %}
+        <div class="node note" style="left: {{ item.x }}px; top: {{ item.y }}px;">
+            <h3>{{ item.note.filename }}</h3>
+            <span class="badge">{{ item.note.subject.name }}</span>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div id="taskbar">
+    <div class="brand">StudyHub OS</div>
+    <div class="view-toggle">
+        <button onclick="window.location.href='{{ url_for('dashboard.index')}}'">Dashboard</button>
+        <button class="active">Board</button>
+    </div>
+    <div class="controls">
+        <button onclick="zoomBoard(-0.1)" title="Zoom out">-</button>
+        <button onclick="zoomBoard(0.1)" title="Zoom in">+</button>
+        <button onclick="resetBoard()" title="Reset">⟳</button>
+     </div>
+</div>
