@@ -41,3 +41,4 @@ Why is the work I am doing on terminal not being counted??
 
 OK I have decided the name, it should be called, StudyAL *IK its not great but better than studyhub*
 
+Yk lets just stuck with studyhub for now

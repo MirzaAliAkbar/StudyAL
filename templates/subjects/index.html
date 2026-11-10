@@ -1,31 +1,48 @@
 {% extends "base.html" %}
 {% block title %}Subjects{% endblock %}
 {% block content %}
-<h2>My Subjects</h2>
-<a href="{{ url_for('subjects.deadlines') }}" class="btn btn-secondary mb-3">Manage Deadlines</a>
-<form method="POST" class="mb-4">
-    <div class="row">
-        <div class="col-md-6">
-            <input type="text" name="name" class="form-control" placeholder="Subject name (e.g. Math)" required>
-        </div>
-        <div class="col-md-2">
-            <button type="submit" class="btn btn-primary w-100">Add Subject</button>
-        </div>
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+    <div>
+        <h2 class="mb-1">Subjects</h2>
+        <p class="text-muted mb-0">Everything on you board is grouped under a subject.</p>
+    </div>
+    <a href="{{ url_for('subjects.deadlines') }}" class="btn btn-secondary">Deadlines -></a>
+</div>
 
+<form method="POST" class="card mb-4">
+    <div class="card-body">
+        <div class="row g-2 align-items-end">
+            <div class="col-me-8">
+                <label class="form-label" for="name">Subject name</label>
+                <input id="name" type="text" name="name" class="form-control"
+                    placeholder="e.g. Mathematics" maxlength="80" required>
+            </div>
+            <div class="col-md-4">
+                <button type="submit" class="btn btn-primary w-100">Add subjects</button>
+            </div>
+        </div>
     </div>
 </form>
 
 {% if subjects %}
-    <ul class="list-group">
-        {% for subject in subjects %}
-            <li class="list-group-item d-flex justify-content-between">
-                {{ subject.name }}
-                <a href="{{ url_for('subjects.delete', subject_id=subject.id) }}" class="text-danger">Delete</a>
-            </li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p> No subjects yet. Add one above.</p>
-
+<div class="row g-3">
+    {% for subject in subjects%}
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body d-flex justify-content-between align-items-center gap-3">
+                <div>
+                    <div class="fe-semibold">{{ subject.name }}</div>
+                    <div class="text-muted small">
+                        {{ subject.deadlines|length }} deadline . {{ subject.notes|length }} notes
+                    </div>
+                    <form method="POST" action="{{ url_for('subjects.delete', subject_id=subject.id) }}" onsubmit="return confirm('Delete this subject and everything inside it?')">
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
 {% endif %}
 {% endblock %}

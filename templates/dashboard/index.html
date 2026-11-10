@@ -1,36 +1,86 @@
 {% extends "base.html" %}
 {% block title %}Dashboard{% endblock %}
 {% block content %}
-<h2>Dashboard</h2>
-
-{% if days_left is not none %}
-    <div class="alert alert-info">Next exam in <strong>{{ days_left }}</strong> days</div>
-{% endif %}
-
-<div class="mb-4">
-    <a href="{{ url_for('subjects.manage') }}" class="btn btn-primary">Manage Subjects</a>
-    <a href="{{ url_for('subjects.deadlines') }}" class="btn btn-secondary">Manage Deadlines</a>
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+    <div>
+        <h2 class="mb-1">Hey {{ current_user.username }}</h2>
+        <p class="text-muted mb-0">
+            {% if next_deadline }
+                Next up: {{ next_deadline.title }} . {{ next_deadline.subject.name }}
+            {% else %}
+                Nothing scheduled. Add a deadline and the countdown starts.
+            {% endif %}
+        </p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('board.index') }}" class="btn btn-primary">Open board</a>
+        <a href="{{ url_for('subjects.deadlines') }}" class="btn btn-secondary>">New deadline</a>
+    </div>
 </div>
 
-<h4>Subjects</h4>
-{% if subjects %}
-    <ul>
-        {% for subject in subjects %}
-            <li>{{ subject.name }}</li>
-        {% endfor %}
-    </ul>
-    {% else %}
-        <p>No subjects yet.</p>
-    {% endif %}
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="stat-label">Next deadline</div>
+                <div class="stat">
+                    {% if days_left is not none %}{{ days_left }}<span>days</span>{% else %} - {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div vlass="card h-100">
+            <div class="stat-label">Subjects</div>
+            <div class="stat">{{ subjects|length }}</div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="stat-label">Upcoming</div>
+                <div class="stat">{{ upcoming_count }}<span>{{ past_count }} past</span></div>
+            </div>
+        </div>
+    </div>
+</div>
 
-    <h4>Upcoming Deadlines</h4>
-    {% if deadlines %}
-        <ul>
-            {% for deadline in deadlines %}
-                <li>{{ deadline.title }} - {{ deadline.exam_date }} ({{ deadline.type}})</li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>No deadlines yet.</p>
-    {% endif %}
-    {% endblock %}
+<div class="row g-4">
+    <div class="col-lg-7">
+        <div class="card h-100">
+            <div class="card-body">
+                {% if upcoming %}
+                <ul class="deadline-list">
+                    {% for d in upcoming %}
+                    <li>
+                        <div>
+                            <div class="deadline-title">{{ d.title }}</div>
+                            <div class="text-muted small">
+                                {{ d.subject.name }} . {{ d.exam_date.strftime('%d %b %Y')}}
+                            </div>
+                        </div>
+                        <span class="chip {{ 'chip-urgent' if d.days_left <= 14 else ''}}">{{ d.days_left }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p class="text-muted mb-0">No upcoming deadlines.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-5">
+        <div class="card h-100">
+            <div class="card-header">Subjects</div>
+            <div class="card-body">
+                {% if subjects %}
+                <div class="d-flex flex-wrap gap-2">
+                    {% for s in subjects %}
+                    <span class="chip">{{ s.name }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

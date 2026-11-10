@@ -17,7 +17,7 @@ def login():
         if user and user.check_password(password):
             login_user(user)
             return redirect(url_for("dashboard.index"))
-        flash("Invalid username or password")
+        flash("Invalid username or password", "error")
 
     return render_template("auth/login.html")
 
@@ -31,11 +31,11 @@ def signup():
         password = request.form.get("password", "")
 
         if User.query.filter_by(username=username).first():
-            flash("Username already taken")
+            flash("Username already taken", "error")
         elif len(username) < 3:
-            flash("Username must be at least 3 characters")
+            flash("Username must be at least 3 characters", "warning")
         elif len(password) < 4:
-            flash("Password must be at least 4 characters")
+            flash("Password must be at least 4 characters", "warning")
 
         else:
             user = User(username=username)
@@ -52,3 +52,4 @@ def signup():
 def logout():
     logout_user()
     return redirect(url_for("auth.login"))
+

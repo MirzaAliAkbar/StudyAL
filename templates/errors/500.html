@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Something broke{% endblock %}
+{% block content %}
+<div class="text-center py-5">
+    <h2 class="mb-2">500</h2>
+    <p class="text-muted">Something broke on our side. Try again.</p>
+    <a class="btn btn-primary" href="{{ url_for('dashboard.index') }}">Back to dashboard</a>
+</div>
+{% endblock %}

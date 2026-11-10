@@ -11,7 +11,7 @@
         </div>
         {% endif %}
 
-        {% for itemin subject_nodes%}
+        {% for item in subject_nodes %}
         <div class="node subject" style="left: {{ item.x }}px; top: {{ item.y }}px;">
             <h3>{{ item.subject.name}}</h3>
             <span class="badge">Subject</span>
@@ -21,7 +21,7 @@
         {% for item in deadline_nodes %}
         <div class="node deadline" style="left: {{ item.x }}px; top: {{ item.y }}px;">
             <h3>{{ item.deadline.exam_date }}</h3>
-            <div class="date">{{ item.deadline.exam }}</div>
+            <div class="date">{{ item.deadline.title }}</div>
             <span class="badge">{{ item.deadline.type }}</span>
         </div>
         {% endfor %}
@@ -31,6 +31,7 @@
             <h3>{{ item.note.filename }}</h3>
             <span class="badge">{{ item.note.subject.name }}</span>
         </div>
+
         {% endfor %}
     </div>
 </div>
@@ -38,7 +39,7 @@
 <div id="taskbar">
     <div class="brand">StudyHub OS</div>
     <div class="view-toggle">
-        <button onclick="window.location.href='{{ url_for('dashboard.index')}}'">Dashboard</button>
+        <button onclick="window.location.href='{{ url_for('dashboard.index') }}'">Dashboard</button>
         <button class="active">Board</button>
     </div>
     <div class="controls">
@@ -47,3 +48,99 @@
         <button onclick="resetBoard()" title="Reset">⟳</button>
      </div>
 </div>
+
+<div id="zoom-indicator">100%</div>
+    <script>
+        let scale = 1, offsetX = 0, offsetY = 0;
+        let isPanning = false, isDragging = false;
+        let activeNode = null, startX = 0, startY = 0, startNX = 0, startNY = 0;
+
+        const viewport = document.getElementById('viewport');
+        const board = document.getElementById("board");
+
+        function updateTransform() {
+            viewport.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${scale})`;
+            document.getElementById('zoom-indicator').textContent = Math.round(scale * 100) + '%';
+        }
+            function zoomBoard(delta) {
+            scale = Math.max(0.3, Math.min(3, scale + delta));
+            updateTransform();
+        }
+        function resetBoard() {
+            scale = 1; offsetX = 0; offsetY = 0;
+            updateTransform();
+        }
+        board.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            zoomBoard(e.deltaY * -0.01);
+        }, { passive: false});
+        board.addEventListener('mousedown', (e) => {
+            const node = e.target.closest('.node');
+            if (node) {
+                isDragging = true;
+                activeNode = node;
+                node.classList.add('dragging');
+                startNX = parseFloat(node.style.left);
+                startNY = parseFloat(node.style.top);
+
+            } else {
+                isPanning = true;
+            }
+            startX= e.clientX;
+            startY= e.clientY;
+
+        });
+        window.addEventListener('mousemove', (e) => {
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+
+            if (isPanning) {
+                offsetx += dx; offsetY += dy;
+                updateTransform();
+            } else if (isDragging && activeNode) {
+                activeNode.style.left = `${startNX + dx / scale}px`;
+                activeNode.style.top = `${startNY + dy / scale}px`;
+            }
+            startX = e.clientX;
+            startY = e.clientY;
+        });
+        window.addEventListener('mouseup', () => {
+            isPanning = false;
+            isDragging = false;
+            if (activeNode) {
+                activeNode.classList.remove('dragging');
+                activeNode = null;
+            }
+        });
+        board.addEventListener('touchstart', (e) => {
+            if (e.touches.length !==1) return;
+            const t = e.touches[0];
+            const node = document.elementFromPoint(t.clientX, t.clientY);
+            if (node && node.closest('.node')) {
+                isDragging = true;
+                activeNode = node.closest('.node');
+                activeNode.classList.add('dragging');
+                startNX = parseFloat(activeNode.style.left);
+                startNY = parseFloat(activeNode.style.top);
+            } else {
+                isPanning = true;
+            }
+            startX = t.clientX; startY = t.clientY;
+        }, { passive: true});
+        board.addEventListener('touchmove', (e) => {
+            if (e.touches.length !== 1) return;
+            const t = e.touches[0];
+            const dx = t.clientX - startX, dy = t.clientY - startY;
+            if (isPanning) {
+                offsetX += dx; offsetY += dy; updateTransform();
+            } else if (isDragging && activeNode) {
+                activeNode.style.left = (startNX + dx / scale) + 'px';
+                activeNode.style.top = (startNY + dy / scale) + 'px';
+            }
+            startX = t.clientX; startY = t.clientY;
+            e.preventDefault();
+        }, { passive: false });
+
+    updateTransform();
+    </script>
+{% endblock %}

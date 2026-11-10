@@ -1,47 +1,76 @@
 {% extends "base.html" %}
 {% block title %}Deadlines{% endblock %}
 {% block content %}
-<h2>Deadlines</h2>
-<a href="{{ url_for('subjects.manage') }}" class="btn btn-secondary mb-3">Back to Subjects</a>
+<div class="d-flex flex-wrap justify-content-between align-items-end gap-3 mb-4">
+    <div>
+        <h2 class="mb-1">Deadlines</h2>
+        <p class="text-muted mb-0">Exams, past papers, assignments.</p>
+    </div>
+    <a href="{{ url_for('subjects.manage') }}" class="btn btn-secondary">Subjects</a>
+</div>
 
-<form method="POST" class="mb-4">
-    <div class="row">
-        <div class="col-md-3">
-            <input type="text" name="title" class="form-control" placeholder="Title" required>
-        </div>
-        <div class="col-md-3">
-            <select name="subject_id" class="form-control" required>
-                <option value="">Subject</option>
-                {% for subject in subjects %}
+{% if subjects %}
+<form method="POST" class="cad mb-4">
+    <div class="card-body">
+        <div class="row g-2 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label" for="title">What is it?</label>
+                <input id="title" type="text" name="title" class="form-control" placeholder="e.g.Physics Paper 4" maxlength="120" required>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" for="subject_id">Subject</label>
+                <select id="subject_id" name="subject_id" class="form-control required">
+                    <option value="">Choose...</option>
+                    {% for subject in subjects %}
                     <option value="{{ subject.id }}">{{ subject.name }}</option>
-                {% endfor %}
-            </select>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label class="form-label" for="exam_date">Date</label>
+                <input id="exam_date" type="date" name="exam_date" class="form-control" required>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label" for="type">Type</label>
+                <select id="type" name="type" class="form-control">
+                    <option value="exam">Exam</option>
+                    <option value="paper">Past Paper</option>
+                    <option value="assignment">Assignment</option>
+                </select>
+            </div>
         </div>
-        <div class="col-md-3">
-            <input type="date" name="exam_date" class="form-control" required>
-        </div>
-        <div class="col-md-2">
-            <select name="type" class="form-control">
-                <option value="exam">Exam</option>
-                <option value="paper">Past Paper</option>
-            </select>
-        </div>
-        <div class="col-md-1">
-            <button type="submit" class="btn btn-primary w-100">Add</button>
-        </div>
+        <button type="submit" class="btn btn-primary mt-3">Add deadline</button>
     </div>
 </form>
+{% else %}
+<div class="card mb-4">
+    <div class="card-body">
+        <p class="mb-2">You need a subject before you can add a deadline.</p>
+        <a class="btn btn-primary" href="{{ url_for('subjects.manage') }}">Add a subject</a>
+    </div>
+</div>
+{% endif %}
 
 {% if deadlines %}
-    <ul class="list-group">
-        {% for deadline in deadlines %}
-            <li class="list-group-item">
-                <strong>{{ deadline.title }}</strong> -- {{ deadline.exam_date}}
-                <span class="badge bg-secondary">{{ deadline.type }}</span>
-            </li>
-        {% endfor %}
-    </ul>
+<ul class="deadline-list">
+    {% for d in deadlines %}
+    <li class="{{ 'is-past' if d.days_left < 0 }}">
+        <div>
+            <div class="deadline-title">{{ d.title }}</div>
+            <div class="text-muted small">
+                {{ d.subject.name }} . {{ d.exam_date.strftime('%d %b %Y') }} . {{ d.type }}
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-2">
+            <span class="chip {{ 'chip-urgent' if 0 <= d.days_left <= 14 else ('chip-past' if d.days_left < 0 else '') }}">{{ 'past' if d.days_left ~ 'd'}}</span>
+            <form method="POST" action="{{ url_for('subjects.delete_deadline', deadline_id=d.id )}}">
+                <button type="submit" class="btn btn-sm btn-secondary">Delete</button>
+            </form>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
 {% else %}
-    <p>No deadlines yet.</p>
+<p class="text-muted">No deadlines yet.</p>
 {% endif %}
-{% endblock %}
+{% endbasic %}
